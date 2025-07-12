@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('./images/background.jpg'); /* Placeholder for the blurred room background */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden; /* Prevent scrollbars due to blur effect */
+        }
+
+        .app-overall-container {
+            display: flex;
+            gap: 1.5rem; /* Space between the sidebar and the main app container */
+            align-items: center;
+            justify-content: center;
+            height: 90vh; /* Match the height of the main app container */
+            max-height: 800px;
+        }
+
+        .app-container {
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            backdrop-filter: blur(20px) saturate(180%); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(20px) saturate(180%); /* For Safari */
+            border-radius: 2rem; /* More rounded corners */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Stronger shadow */
+            display: flex;
+            width: 90%; /* Responsive width */
+            max-width: 1200px; /* Max width for desktop */
+            height: 100%; /* Take full height of app-overall-container */
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+        }
+
+        .left-sidebar {
+            flex-shrink: 0; /* Prevent shrinking */
+            width: 70px; /* Fixed width for the left sidebar on desktop */
+            background-color: rgba(255, 255, 255, 0.2); /* Frosted glass for sidebar */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 2rem; /* Rounded corners for the standalone sidebar */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            display: flex;
+            flex-direction: column; /* Default to column for desktop */
+            align-items: center;
+            padding: 1.5rem 0.5rem;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+        }
+
+        .left-pane {
+            flex: 0 0 35%; /* Left pane takes 35% width */
+            background-color: rgba(255, 255, 255, 0.2); /* Slightly darker for distinction */
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow-y: auto; /* Scrollable for chat list */
+        }
+
+        .right-pane {
+            flex: 1; /* Right pane takes remaining width */
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(255, 255, 255, 0.1); /* Lighter for conversation area */
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        .left-pane::-webkit-scrollbar, .message-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .left-pane::-webkit-scrollbar-track, .message-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .left-pane::-webkit-scrollbar-thumb, .message-area::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .left-pane::-webkit-scrollbar-thumb:hover, .message-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .chat-list-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-list-item.active {
+            background-color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.4); /* Avatar border */
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem; /* More rounded corners for bubbles */
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sent-message {
+            background-color: rgba(100, 116, 139, 0.6); /* Slate-like color, semi-transparent */
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem; /* Slightly less rounded on the bottom right */
+        }
+
+        .received-message {
+            background-color: rgba(255, 255, 255, 0.6); /* White, semi-transparent */
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem; /* Slightly less rounded on the bottom left */
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+        }
+
+        .sent-message .message-time {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .received-message .message-time {
+            text-align: left;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .app-overall-container {
+                flex-direction: column;
+                gap: 1rem;
+                height: 95vh;
+            }
+            .app-container {
+                flex-direction: column;
+                width: 95%;
+                height: auto; /* Let content define height on mobile */
+            }
+            .left-sidebar {
+                width: 95%; /* Full width on mobile */
+                height: 70px; /* Fixed height for horizontal layout */
+                flex-direction: row; /* Horizontal layout for sidebar itself */
+                padding: 0.5rem 1.5rem;
+                border-right: none;
+                justify-content: space-around; /* Distribute items horizontally */
+                align-items: center; /* Center items vertically in the row */
+            }
+            .left-sidebar > div:first-child { /* Target the div containing the main icons */
+                flex-direction: row; /* Make icons within this div a row */
+                justify-content: space-around; /* Distribute icons horizontally */
+                flex-grow: 1; /* Allow it to take available space */
+                margin-top: 0; /* Remove top margin */
+                margin-bottom: 0; /* Remove bottom margin */
+                /* Tailwind's space-y-6 will be overridden by flex-direction: row, but explicitly reset if needed */
+                --tw-space-y-reverse: 0; /* Reset space-y for mobile */
+                margin-top: calc(0rem * var(--tw-space-y-reverse));
+                margin-bottom: calc(0rem * (1 - var(--tw-space-y-reverse)));
+            }
+            .left-sidebar button { /* Apply to all buttons in sidebar for consistent sizing */
+                padding: 0.75rem; /* Slightly smaller padding for mobile icons */
+                width: 48px; /* Fixed width for icon buttons */
+                height: 48px; /* Fixed height for icon buttons */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .left-pane {
+                flex: none;
+                height: 40%; /* Adjust height for mobile */
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            }
+            .right-pane {
+                flex: 1;
+                height: 60%; /* Adjust height for mobile */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 antialiased">
+
+    <div class="app-overall-container">
+        <!-- Left Sidebar: Navigation Icons -->
+        <div class="left-sidebar bg-black/30">
+            <div class="flex flex-col items-center space-y-6 flex-grow">
+                <button class="p-3 rounded-full bg-white/40 hover:bg-white/50 transition-colors">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </button>
+                <button class="p-3 rounded-full  hover:bg-white/50 transition-colors">
+                     <i class='bxr  bx-search-alt w-7 h-7 text-white text-3xl'  ></i> 
+                </button>
+            
+                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
+                    <i class='bxr  bx-plus-square w-7 h-7 text-white  text-3xl'  ></i> 
+                </button>
+                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                </button>
+                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
+                   <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </button>
+               
+            </div>
+           
+        </div>
+
+        <!-- Main App Container -->
+        <div class="app-container">
+            <!-- Left Pane: Chat List -->
+            <div class="left-pane bg-black/30">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl font-semibold text-white">Messages</h1>
+                    <div class="flex items-center space-x-3">
+                        <button class="p-2  rounded-full items-center hover:bg-white/30 transition-colors">
+                            <i class='bxr  bx-microphone w-6 h-6 text-white text-3xl'  ></i> 
+                            
+                        </button>
+                        
+                    </div>
+                </div>
+
+                <div class="relative mb-6">
+                    <input type="text" placeholder="Search" class="w-full pl-10 pr-4 py-2 rounded-xl bg-black/40 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Chat List Items -->
+                <div class="flex-1 overflow-y-auto pr-2">
+                    <div class="chat-list-item active">
+                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Arlene McCoy" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Arlene McCoy</span>
+                                <span class="text-white/70 text-sm">Now</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">It's really nice.</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-joelson-melo-9135-50855.jpg" alt="Guy Hawkins" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Guy Hawkins</span>
+                                <span class="text-white/70 text-sm">~4:45PM</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Are you there?</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-nappy-3460134.jpg" alt="Courtney Henry" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Courtney Henry</span>
+                                <span class="text-white/70 text-sm">~5:00PM</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Hello?</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-olly-3760376.jpg" alt="Jerome Bell" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Jerome Bell</span>
+                                <span class="text-white/70 text-sm">Yesterday</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Hello?</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-olly-3777564.jpg" alt="Jane Cooper" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Jane Cooper</span>
+                                <span class="text-white/70 text-sm">13 Mar</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Okay...</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-teddyjmodel-2955376.jpg" alt="Dianne Russell" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Dianne Russell</span>
+                                <span class="text-white/70 text-sm">2 Jan</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Hello? Interested...</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="https://placehold.co/48x48/6B7280/FFFFFF?text=RE" alt="Ralph Edwards" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Ralph Edwards</span>
+                                <span class="text-white/70 text-sm">2 Jan</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Hello?</p>
+                        </div>
+                    </div>
+                    <div class="chat-list-item">
+                        <img src="./images/pexels-chloekalaartist-1043474.jpg" alt="Eleanor Pena" class="avatar">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white font-medium">Eleanor Pena</span>
+                                <span class="text-white/70 text-sm">2 Jan</span>
+                            </div>
+                            <p class="text-white/80 text-sm truncate">Hi!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 ">
+                    <button class="w-full py-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-center hover:bg-white/50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        New Message
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Pane: Chat Conversation -->
+            <div class="right-pane bg-black/20">
+                <!-- Chat Header -->
+                <div class="flex items-center justify-between p-6 bg-black/20 border-b border-white/30">
+                    <div class="flex items-center">
+                        <button class="p-2 mr-2 rounded-full hover:bg-white/30 transition-colors md:hidden">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar">
+                        <div>
+                            <h2 class="text-xl font-semibold text-white">Arlene McCoy</h2>
+                            <p class="text-white/70 text-sm">guy102</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
+                            <i class='bxr  bx-phone w-6 h-6 text-white text-3xl'  ></i> 
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
+                           <i class='bxr  bx-camera-alt w-6 h-6 text-white text-3xl'  ></i> 
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
+                            <i class='bxr  bx-clock-12 w-6 h-6 text-white text-3xl'  ></i> 
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Message Area -->
+                <div class="flex-1 p-6 overflow-y-auto flex flex-col message-area">
+                    <!-- Date separator -->
+                    <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
+
+                    <!-- Received message -->
+                    <div class="message-bubble received-message">
+                        <p>Hey there! 👋 I've been feeling quite overwhelmed lately with work.</p>
+                        <span class="message-time">04:15 AM</span>
+                    </div>
+
+                    <!-- Sent message -->
+                    <div class="message-bubble sent-message">
+                        <p>Amante de cinema e viciado em pipoca! 🍿</p>
+                        <span class="message-time">08:20 PM</span>
+                    </div>
+
+                    <!-- Date separator -->
+                    <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
+
+                    <!-- Received message -->
+                    <div class="message-bubble received-message">
+                        <p>When will the contract be sent?</p>
+                        <span class="message-time">06:15 AM</span>
+                    </div>
+
+                    <!-- Sent message -->
+                    <div class="message-bubble sent-message">
+                        <p>Paperless opt-in email sent</p>
+                        <span class="message-time">08:20 PM</span>
+                    </div>
+
+                    <!-- Placeholder for more messages -->
+                    <div class="message-bubble received-message">
+                        <p>Got it. Thanks!</p>
+                        <span class="message-time">08:25 PM</span>
+                    </div>
+                    <div class="message-bubble sent-message">
+                        <p>You're welcome!</p>
+                        <span class="message-time">08:26 PM</span>
+                    </div>
+                    <div class="message-bubble received-message">
+                        <p>How's your day going?</p>
+                        <span class="message-time">08:30 PM</span>
+                    </div>
+                    <div class="message-bubble sent-message">
+                        <p>Pretty good, just wrapping up some tasks.</p>
+                        <span class="message-time">08:35 PM</span>
+                    </div>
+                </div>
+
+                <!-- Message Input Area -->
+                <div class="p-6 bg-black/20 border-t border-white/30 flex items-center space-x-4">
+                    <input type="text" placeholder="Write something" class="flex-1 py-3 px-5 rounded-full bg-black/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    <button class="bg-white hover:bg-black hover:text-white text-black font-semibold py-3 px-6 rounded-full shadow-lg transition-colors">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
