@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messaging App</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +20,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            overflow: hidden; /* Prevent scrollbars due to blur effect */
+            
         }
 
         .app-overall-container {
@@ -43,7 +42,7 @@
             width: 90%; /* Responsive width */
             max-width: 1200px; /* Max width for desktop */
             height: 100%; /* Take full height of app-overall-container */
-            overflow: hidden;
+            
             border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
         }
 
@@ -69,6 +68,7 @@
             border-right: 1px solid rgba(255, 255, 255, 0.3);
             display: flex;
             flex-direction: column;
+            border-radius: 30px 0px 0px 30px;
             padding: 1.5rem;
             overflow-y: auto; /* Scrollable for chat list */
         }
@@ -77,6 +77,7 @@
             flex: 1; /* Right pane takes remaining width */
             display: flex;
             flex-direction: column;
+            border-radius: 0px 30px 30px 0px;
             background-color: rgba(255, 255, 255, 0.1); /* Lighter for conversation area */
         }
 
@@ -170,89 +171,197 @@
             .app-overall-container {
                 flex-direction: column;
                 gap: 1rem;
-                height: 95vh;
+                height: auto; /* Allow height to adjust based on content */
+                min-height: 100vh; /* Ensure it takes full viewport height */
+                padding: 1rem 0; /* Add some vertical padding */
             }
             .app-container {
                 flex-direction: column;
-                width: 95%;
-                height: auto; /* Let content define height on mobile */
+                width: 95%; /* Wider on mobile */
+                height: auto; /* Let content define height */
             }
             .left-sidebar {
                 width: 95%; /* Full width on mobile */
-                height: 70px; /* Fixed height for horizontal layout */
+                height: auto; /* Height adapts to content */
                 flex-direction: row; /* Horizontal layout for sidebar itself */
-                padding: 0.5rem 1.5rem;
-                border-right: none;
-                justify-content: space-around; /* Distribute items horizontally */
-                align-items: center; /* Center items vertically in the row */
+                padding: 0.5rem 1rem; /* Adjust padding */
+                border-right: none; /* Remove right border */
+                justify-content: space-around; /* Distribute items evenly */
+                border-radius: 1rem; /* Adjust border-radius for standalone look */
             }
             .left-sidebar > div:first-child { /* Target the div containing the main icons */
                 flex-direction: row; /* Make icons within this div a row */
                 justify-content: space-around; /* Distribute icons horizontally */
                 flex-grow: 1; /* Allow it to take available space */
-                margin-top: 0; /* Remove top margin */
-                margin-bottom: 0; /* Remove bottom margin */
-                /* Tailwind's space-y-6 will be overridden by flex-direction: row, but explicitly reset if needed */
+                margin: 0; /* Remove top/bottom margins */
                 --tw-space-y-reverse: 0; /* Reset space-y for mobile */
-                margin-top: calc(0rem * var(--tw-space-y-reverse));
-                margin-bottom: calc(0rem * (1 - var(--tw-space-y-reverse)));
             }
             .left-sidebar button { /* Apply to all buttons in sidebar for consistent sizing */
-                padding: 0.75rem; /* Slightly smaller padding for mobile icons */
-                width: 48px; /* Fixed width for icon buttons */
+                padding: 0.75rem; 
+                width: 48px; 
                 height: 48px; /* Fixed height for icon buttons */
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
             .left-pane {
-                flex: none;
-                height: 40%; /* Adjust height for mobile */
+                flex: none; /* Do not flex-grow */
+                width: 100%; /* Take full width on mobile */
+                max-height: 100vh; /* Limit height of chat list on mobile */
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 1rem; /* Adjust padding */
             }
             .right-pane {
-                flex: 1;
-                height: 60%; /* Adjust height for mobile */
+                flex: 1; /* Flex-grow to take remaining space */
+                width: 100%; /* Take full width on mobile */
+                min-height: 50vh;
+               
             }
+
+            /* Adjust header elements on mobile */
+            .left-pane .flex.items-center.justify-between.mb-6 {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 1rem;
+            }
+            .left-pane .flex.items-center.justify-between.mb-6 h1 {
+                margin-bottom: 0.5rem;
+            }
+            .left-pane .flex.items-center.space-x-3 {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            /* Hide the left pane by default and show right pane on mobile */
+            .left-pane-hidden {
+                display: none;
+            }
+            .right-pane-full {
+                width: 100%;
+                flex: 1;
+            }
+
+            /* Show/hide panes based on active state (JS needed for full functionality) */
+            .app-container.show-left .left-pane {
+                display: flex;
+            }
+            /* .app-container.show-left .right-pane {
+                display: none;
+            } */
+            .app-container.show-right .left-pane {
+                display: none;
+            }
+            .app-container.show-right .right-pane {
+                display: flex;
+            }
+        }
+
+        /* Further adjustments for smaller mobile screens (e.g., width less than 480px) */
+        @media (max-width: 480px) {
+            body{
+                justify-content: start;
+            }
+            .app-overall-container {
+                gap: 0.75rem;
+                justify-content: start;
+                width: 100%;
+                min-height: 275vh
+            }
+            .app-container {
+                border-radius: 1.5rem;
+            }
+            .left-sidebar {
+                padding: 0.4rem 0.8rem;
+                border-radius: 1rem;
+            }
+            .left-sidebar button {
+                padding: 0.6rem;
+                width: 40px;
+                height: 40px;
+            }
+            .left-pane {
+                padding: 0.8rem;
+            }
+
+            .top-txt{
+                justify-content: center;
+            }
+            .chat-list-item {
+                padding: 0.6rem 0.8rem;
+                border-radius: 0.6rem;
+            }
+            .avatar {
+                width: 40px;
+                height: 40px;
+                margin-right: 0.75rem;
+            }
+            .chat-avatar{
+                width: 75px;
+                height: 60px;
+            }
+            .message-bubble {
+                padding: 0.6rem 0.8rem;
+                border-radius: 1rem;
+            }
+            .right-pane{
+                 margin-top: 5rem; /* Ensure minimum height for conversation area */
+            }
+            .left-pane .flex.items-center.justify-between.mb-6 {
+          
+                flex-direction: row;
+            }
+            .right-pane .p-6 {
+                padding: 0.2rem;
+            }
+            .right-pane input[type="text"] {
+                padding: 0.75rem 0.5rem;
+            }
+            .right-pane button.bg-white {
+                padding: 0.75rem 1.25rem;
+            }
+            .right-arrow{
+                display: none;
+            }
+           .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1.2rem * calc(1 - var(--tw-space-y-reverse))) !important;
+    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse)) !important;
+}
         }
     </style>
 </head>
 <body class="bg-gray-100 antialiased">
 
-    <div class="app-overall-container">
-        <!-- Left Sidebar: Navigation Icons -->
-        <div class="left-sidebar bg-black/30">
+    <div class="app-overall-container ">
+        <div class="left-sidebar bg-black/30 rounded-full">
             <div class="flex flex-col items-center space-y-6 flex-grow">
                 <button class="p-3 rounded-full bg-white/40 hover:bg-white/50 transition-colors">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <svg class="left-side-btn w-7  text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 </button>
                 <button class="p-3 rounded-full  hover:bg-white/50 transition-colors">
-                     <i class='bxr  bx-search-alt w-7 h-7 text-white text-3xl'  ></i> 
+                    <i class='left-side-btn bxr  bx-search-alt w-7  text-white text-3xl'  ></i> 
                 </button>
             
                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <i class='bxr  bx-plus-square w-7 h-7 text-white  text-3xl'  ></i> 
-                </button>
-                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <i class='left-side-btn bxr  bx-plus-square w-7 text-white  text-3xl'  ></i> 
                 </button>
                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                   <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <svg class=" left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                 </button>
-               
+                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
+                    <svg class=" left-side-btn w-7  text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </button>
+                
             </div>
-           
+            
         </div>
 
-        <!-- Main App Container -->
-        <div class="app-container">
-            <!-- Left Pane: Chat List -->
-            <div class="left-pane bg-black/30">
-                <div class="flex items-center justify-between mb-6">
+        <div class="app-container show-left"> <div class="left-pane bg-black/30">
+                <div class="flex items-center justify-between mb-6 top-txt">
                     <h1 class="text-3xl font-semibold text-white">Messages</h1>
                     <div class="flex items-center space-x-3">
-                        <button class="p-2  rounded-full items-center hover:bg-white/30 transition-colors">
+                        <button class="p-2 rounded-full items-center hover:bg-white/30 transition-colors">
                             <i class='bxr  bx-microphone w-6 h-6 text-white text-3xl'  ></i> 
                             
                         </button>
@@ -267,9 +376,8 @@
                     </div>
                 </div>
 
-                <!-- Chat List Items -->
                 <div class="flex-1 overflow-y-auto pr-2">
-                    <div class="chat-list-item active">
+                    <div class="chat-list-item active" onclick="showRightPane()">
                         <img src="./images/pexels-elsimage-1405963.jpg" alt="Arlene McCoy" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -279,7 +387,7 @@
                             <p class="text-white/80 text-sm truncate">It's really nice.</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-joelson-melo-9135-50855.jpg" alt="Guy Hawkins" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -289,7 +397,7 @@
                             <p class="text-white/80 text-sm truncate">Are you there?</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-nappy-3460134.jpg" alt="Courtney Henry" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -299,7 +407,7 @@
                             <p class="text-white/80 text-sm truncate">Hello?</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-olly-3760376.jpg" alt="Jerome Bell" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -309,7 +417,7 @@
                             <p class="text-white/80 text-sm truncate">Hello?</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-olly-3777564.jpg" alt="Jane Cooper" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -319,7 +427,7 @@
                             <p class="text-white/80 text-sm truncate">Okay...</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-teddyjmodel-2955376.jpg" alt="Dianne Russell" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -329,7 +437,7 @@
                             <p class="text-white/80 text-sm truncate">Hello? Interested...</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="https://placehold.co/48x48/6B7280/FFFFFF?text=RE" alt="Ralph Edwards" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -339,7 +447,7 @@
                             <p class="text-white/80 text-sm truncate">Hello?</p>
                         </div>
                     </div>
-                    <div class="chat-list-item">
+                    <div class="chat-list-item" onclick="showRightPane()">
                         <img src="./images/pexels-chloekalaartist-1043474.jpg" alt="Eleanor Pena" class="avatar">
                         <div class="flex-1">
                             <div class="flex justify-between items-center">
@@ -352,22 +460,20 @@
                 </div>
 
                 <div class="mt-6 ">
-                    <button class="w-full py-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-center hover:bg-white/50 transition-colors">
+                    <button class=" w-full p-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-between lg:justify-center hover:bg-white/50 transition-colors right-new-message">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         New Message
                     </button>
                 </div>
             </div>
 
-            <!-- Right Pane: Chat Conversation -->
-            <div class="right-pane bg-black/20">
-                <!-- Chat Header -->
-                <div class="flex items-center justify-between p-6 bg-black/20 border-b border-white/30">
+            <div class="right-pane bg-black/20 border-5 ">
+                <div class="flex items-center justify-between p-6   bg-black/20 border-b border-white/30">
                     <div class="flex items-center">
-                        <button class="p-2 mr-2 rounded-full hover:bg-white/30 transition-colors md:hidden">
+                        <button class="right-arrow p-2 mr-2 rounded-full hover:bg-white/30 transition-colors md:hidden" onclick="showLeftPane()">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                         </button>
-                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar">
+                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar chat-avatar">
                         <div>
                             <h2 class="text-xl font-semibold text-white">Arlene McCoy</h2>
                             <p class="text-white/70 text-sm">guy102</p>
@@ -386,39 +492,31 @@
                     </div>
                 </div>
 
-                <!-- Message Area -->
                 <div class="flex-1 p-6 overflow-y-auto flex flex-col message-area">
-                    <!-- Date separator -->
                     <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
 
-                    <!-- Received message -->
                     <div class="message-bubble received-message">
                         <p>Hey there! 👋 I've been feeling quite overwhelmed lately with work.</p>
                         <span class="message-time">04:15 AM</span>
                     </div>
 
-                    <!-- Sent message -->
                     <div class="message-bubble sent-message">
                         <p>Amante de cinema e viciado em pipoca! 🍿</p>
                         <span class="message-time">08:20 PM</span>
                     </div>
 
-                    <!-- Date separator -->
                     <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
 
-                    <!-- Received message -->
                     <div class="message-bubble received-message">
                         <p>When will the contract be sent?</p>
                         <span class="message-time">06:15 AM</span>
                     </div>
 
-                    <!-- Sent message -->
                     <div class="message-bubble sent-message">
                         <p>Paperless opt-in email sent</p>
                         <span class="message-time">08:20 PM</span>
                     </div>
 
-                    <!-- Placeholder for more messages -->
                     <div class="message-bubble received-message">
                         <p>Got it. Thanks!</p>
                         <span class="message-time">08:25 PM</span>
@@ -437,7 +535,6 @@
                     </div>
                 </div>
 
-                <!-- Message Input Area -->
                 <div class="p-6 bg-black/20 border-t border-white/30 flex items-center space-x-4">
                     <input type="text" placeholder="Write something" class="flex-1 py-3 px-5 rounded-full bg-black/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50">
                     <button class="bg-white hover:bg-black hover:text-white text-black font-semibold py-3 px-6 rounded-full shadow-lg transition-colors">
@@ -448,5 +545,53 @@
         </div>
     </div>
 
+    <script>
+        // JavaScript for showing/hiding panes on mobile
+        function showRightPane() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.app-container').classList.remove('show-left');
+                document.querySelector('.app-container').classList.add('show-right');
+            }
+        }
+
+        function showLeftPane() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.app-container').classList.remove('show-right');
+                document.querySelector('.app-container').classList.add('show-left');
+            }
+        }
+
+        // Initialize display based on screen size
+        // window.onload = function() {
+        //     if (window.innerWidth <= 768) {
+        //         document.querySelector('.right-pane').style.display = 'none'; // Initially hide right pane on mobile
+        //     }
+        // };
+
+        window.onresize = function() {
+            const appContainer = document.querySelector('.app-container');
+            const leftPane = document.querySelector('.left-pane');
+            const rightPane = document.querySelector('.right-pane');
+
+            if (window.innerWidth > 768) {
+                appContainer.classList.remove('show-left', 'show-right');
+                leftPane.style.display = 'flex'; // Ensure flex display on desktop
+                rightPane.style.display = 'flex'; // Ensure flex display on desktop
+            } else {
+                // On mobile, if neither is explicitly shown, default to showing left
+                if (!appContainer.classList.contains('show-left') && !appContainer.classList.contains('show-right')) {
+                    appContainer.classList.add('show-left');
+                    leftPane.style.display = 'flex';
+                    rightPane.style.display = 'none';
+                } else if (appContainer.classList.contains('show-left')) {
+                    leftPane.style.display = 'flex';
+                    rightPane.style.display = 'none';
+                } else if (appContainer.classList.contains('show-right')) {
+                    leftPane.style.display = 'none';
+                    rightPane.style.display = 'flex';
+                }
+            }
+        };
+    </script>
 </body>
 </html>
