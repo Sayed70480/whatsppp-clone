@@ -20,7 +20,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
         }
 
         .app-overall-container {
@@ -30,6 +30,8 @@
             justify-content: center;
             height: 90vh; /* Match the height of the main app container */
             max-height: 800px;
+            width: 100%; /* Ensure it takes full width for consistent centering */
+            max-width: 1200px; /* Limit overall max width */
         }
 
         .app-container {
@@ -42,8 +44,8 @@
             width: 90%; /* Responsive width */
             max-width: 1200px; /* Max width for desktop */
             height: 100%; /* Take full height of app-overall-container */
-            
             border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+            position: relative; /* Needed for absolute positioning of panes on mobile */
         }
 
         .left-sidebar {
@@ -68,7 +70,7 @@
             border-right: 1px solid rgba(255, 255, 255, 0.3);
             display: flex;
             flex-direction: column;
-            border-radius: 30px 0px 0px 30px;
+            border-radius: 2rem 0px 0px 2rem; /* Match app-container top-left, adjusted for desktop */
             padding: 1.5rem;
             overflow-y: auto; /* Scrollable for chat list */
         }
@@ -77,7 +79,7 @@
             flex: 1; /* Right pane takes remaining width */
             display: flex;
             flex-direction: column;
-            border-radius: 0px 30px 30px 0px;
+            border-radius: 0px 2rem 2rem 0px; /* Match app-container top-right, adjusted for desktop */
             background-color: rgba(255, 255, 255, 0.1); /* Lighter for conversation area */
         }
 
@@ -166,153 +168,133 @@
             color: rgba(0, 0, 0, 0.6);
         }
 
-        /* Responsive adjustments */
+        /* Hide the back arrow by default (desktop) */
+        .right-arrow {
+            display: none;
+        }
+
+        /* Responsive adjustments for mobile (max-width 768px) */
         @media (max-width: 768px) {
+            body {
+                align-items: flex-start; /* Align to top on mobile */
+                padding-top: 1rem; /* Add some top padding */
+                min-height: 100vh; /* Ensure body takes full viewport height */
+            }
+
             .app-overall-container {
-                flex-direction: column;
+                flex-direction: column; /* Stack sidebar and app-container */
                 gap: 1rem;
                 height: auto; /* Allow height to adjust based on content */
-                min-height: 100vh; /* Ensure it takes full viewport height */
-                padding: 1rem 0; /* Add some vertical padding */
-            }
-            .app-container {
-                flex-direction: column;
+                min-height: auto; /* Remove min-height from app-overall-container to allow full height of children */
                 width: 95%; /* Wider on mobile */
-                height: auto; /* Let content define height */
+                max-width: none; /* Remove max-width on mobile */
+                align-items: center; /* Center horizontally for the stacked items */
             }
+
             .left-sidebar {
-                width: 95%; /* Full width on mobile */
+                width: 100%; /* Full width on mobile */
                 height: auto; /* Height adapts to content */
-                flex-direction: row; /* Horizontal layout for sidebar itself */
+                flex-direction: row; /* Horizontal layout for sidebar items */
                 padding: 0.5rem 1rem; /* Adjust padding */
                 border-right: none; /* Remove right border */
                 justify-content: space-around; /* Distribute items evenly */
                 border-radius: 1rem; /* Adjust border-radius for standalone look */
+                margin-bottom: 0.5rem; /* Space between sidebar and app-container */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Maintain shadow */
             }
+
             .left-sidebar > div:first-child { /* Target the div containing the main icons */
                 flex-direction: row; /* Make icons within this div a row */
                 justify-content: space-around; /* Distribute icons horizontally */
                 flex-grow: 1; /* Allow it to take available space */
                 margin: 0; /* Remove top/bottom margins */
                 --tw-space-y-reverse: 0; /* Reset space-y for mobile */
+                gap: 0.5rem; /* Small gap between buttons */
             }
             .left-sidebar button { /* Apply to all buttons in sidebar for consistent sizing */
-                padding: 0.75rem; 
-                width: 48px; 
+                padding: 0.75rem;
+                width: 48px;
                 height: 48px; /* Fixed height for icon buttons */
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
+
+            .app-container {
+                flex-direction: column; /* Stack left-pane and right-pane */
+                width: 100%; /* Take full width of app-overall-container */
+                height: 90vh; /* Give app-container a fixed height for mobile viewport */
+                max-width: none; /* Remove max-width on mobile */
+                border-radius: 2rem; /* Maintain border-radius */
+                overflow: hidden; /* Hide overflow of absolute positioned children */
+            }
+
+            .left-pane, .right-pane {
+                position: absolute; /* Absolute position within app-container */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%; /* Take full height of app-container */
+                border-right: none; /* Remove desktop-specific borders */
+                border-bottom: none; /* Remove desktop-specific borders */
+                border-radius: 2rem; /* Apply full border-radius to both panes on mobile */
+                transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Add transform for slide effect */
+                display: flex; /* Keep flex display to maintain internal layout */
+                flex-direction: column; /* Ensure internal content stacks */
+                overflow-y: auto; /* Ensure scrollability for both panes */
+            }
+
+            /* Mobile view: showing/hiding panes for single view experience */
+            .app-container.show-left .left-pane {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateX(0); /* Slide in */
+                z-index: 10; /* Ensure left pane is above right when active */
+            }
+            .app-container.show-left .right-pane {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateX(100%); /* Slide out to the right */
+                z-index: 5;
+            }
+            .app-container.show-right .left-pane {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateX(-100%); /* Slide out to the left */
+                z-index: 5;
+            }
+            .app-container.show-right .right-pane {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateX(0); /* Slide in */
+                z-index: 10; /* Ensure right pane is above left when active */
+            }
+
+            /* Specific adjustments for pane content on mobile */
             .left-pane {
-                flex: none; /* Do not flex-grow */
-                width: 100%; /* Take full width on mobile */
-                max-height: 100vh; /* Limit height of chat list on mobile */
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
                 padding: 1rem; /* Adjust padding */
             }
             .right-pane {
-                flex: 1; /* Flex-grow to take remaining space */
-                width: 100%; /* Take full width on mobile */
-                min-height: 50vh;
-               
+                padding: 0; /* Reset padding, inner divs will handle it */
             }
 
-            /* Adjust header elements on mobile */
+            /* Adjust header elements on mobile (left pane) */
             .left-pane .flex.items-center.justify-between.mb-6 {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row; /* Keep elements in header aligned horizontally */
+                align-items: center;
                 margin-bottom: 1rem;
             }
             .left-pane .flex.items-center.justify-between.mb-6 h1 {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0; /* Remove bottom margin */
             }
             .left-pane .flex.items-center.space-x-3 {
-                width: 100%;
+                width: auto; /* Let content define width */
                 justify-content: flex-end;
             }
 
-            /* Hide the left pane by default and show right pane on mobile */
-            .left-pane-hidden {
-                display: none;
-            }
-            .right-pane-full {
-                width: 100%;
-                flex: 1;
-            }
-
-            /* Show/hide panes based on active state (JS needed for full functionality) */
-            .app-container.show-left .left-pane {
-                display: flex;
-            }
-            /* .app-container.show-left .right-pane {
-                display: none;
-            } */
-            .app-container.show-right .left-pane {
-                display: none;
-            }
-            .app-container.show-right .right-pane {
-                display: flex;
-            }
-        }
-
-        /* Further adjustments for smaller mobile screens (e.g., width less than 480px) */
-        @media (max-width: 480px) {
-            body{
-                justify-content: start;
-            }
-            .app-overall-container {
-                gap: 0.75rem;
-                justify-content: start;
-                width: 100%;
-                min-height: 275vh
-            }
-            .app-container {
-                border-radius: 1.5rem;
-            }
-            .left-sidebar {
-                padding: 0.4rem 0.8rem;
-                border-radius: 1rem;
-            }
-            .left-sidebar button {
-                padding: 0.6rem;
-                width: 40px;
-                height: 40px;
-            }
-            .left-pane {
-                padding: 0.8rem;
-            }
-
-            .top-txt{
-                justify-content: center;
-            }
-            .chat-list-item {
-                padding: 0.6rem 0.8rem;
-                border-radius: 0.6rem;
-            }
-            .avatar {
-                width: 40px;
-                height: 40px;
-                margin-right: 0.75rem;
-            }
-            .chat-avatar{
-                width: 75px;
-                height: 60px;
-            }
-            .message-bubble {
-                padding: 0.6rem 0.8rem;
-                border-radius: 1rem;
-            }
-            .right-pane{
-                 margin-top: 5rem; /* Ensure minimum height for conversation area */
-            }
-            .left-pane .flex.items-center.justify-between.mb-6 {
-          
-                flex-direction: row;
-            }
+            /* Adjust header elements on mobile (right pane) */
             .right-pane .p-6 {
-                padding: 0.2rem;
+                padding: 1rem; /* Adjust padding for right pane header */
             }
             .right-pane input[type="text"] {
                 padding: 0.75rem 0.5rem;
@@ -320,52 +302,104 @@
             .right-pane button.bg-white {
                 padding: 0.75rem 1.25rem;
             }
-            .right-arrow{
-                display: none;
+            .right-arrow {
+                display: block; /* Ensure the back arrow is visible on mobile */
             }
-           .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(1.2rem * calc(1 - var(--tw-space-y-reverse))) !important;
-    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse)) !important;
-}
+
+            .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+                --tw-space-y-reverse: 0;
+                margin-top: calc(1.2rem * calc(1 - var(--tw-space-y-reverse))) !important;
+                margin-bottom: calc(1.5rem * var(--tw-space-y-reverse)) !important;
+            }
+            
+            /* Smaller mobile screens (e.g., width less than 480px) */
+            @media (max-width: 480px) {
+                .app-overall-container {
+                    gap: 0.75rem;
+                    padding: 0.5rem; /* Slightly less padding from body edge */
+                }
+                .app-container {
+                    border-radius: 1.5rem;
+                }
+                .left-sidebar {
+                    padding: 0.4rem 0.8rem;
+                    border-radius: 0.8rem;
+                }
+                .left-sidebar button {
+                    padding: 0.6rem;
+                    width: 40px;
+                    height: 40px;
+                }
+                .left-pane {
+                    padding: 0.8rem;
+                }
+                .top-txt { /* Adjust based on your screenshot alignment */
+                    justify-content: space-between; /* Revert to space-between for better alignment */
+                    flex-direction: row; /* Keep horizontal for title and mic button */
+                    align-items: center;
+                }
+                .chat-list-item {
+                    padding: 0.6rem 0.8rem;
+                    border-radius: 0.6rem;
+                }
+                .avatar {
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 0.75rem;
+                }
+                .chat-avatar{
+                    width: 48px; /* Consistent avatar size in chat header */
+                    height: 48px;
+                }
+                .message-bubble {
+                    padding: 0.6rem 0.8rem;
+                    border-radius: 1rem;
+                }
+                .right-pane .p-6 {
+                    padding: 0.75rem; /* Smaller padding for header/footer */
+                }
+                .right-pane input[type="text"] {
+                    padding: 0.6rem 0.4rem;
+                }
+                .right-pane button.bg-white {
+                    padding: 0.6rem 1rem;
+                    font-size: 0.875rem; /* sm text */
+                }
+            }
         }
     </style>
 </head>
 <body class="bg-gray-100 antialiased">
 
-    <div class="app-overall-container ">
+    <div class="app-overall-container">
         <div class="left-sidebar bg-black/30 rounded-full">
             <div class="flex flex-col items-center space-y-6 flex-grow">
                 <button class="p-3 rounded-full bg-white/40 hover:bg-white/50 transition-colors">
-                    <svg class="left-side-btn w-7  text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 </button>
-                <button class="p-3 rounded-full  hover:bg-white/50 transition-colors">
-                    <i class='left-side-btn bxr  bx-search-alt w-7  text-white text-3xl'  ></i> 
-                </button>
-            
-                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <i class='left-side-btn bxr  bx-plus-square w-7 text-white  text-3xl'  ></i> 
+                <button class="p-3 rounded-full hover:bg-white/50 transition-colors">
+                    <i class='left-side-btn bxr bx-search-alt w-7 text-white text-3xl'></i> 
                 </button>
                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <svg class=" left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <i class='left-side-btn bxr bx-plus-square w-7 text-white text-3xl'></i> 
                 </button>
                 <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <svg class=" left-side-btn w-7  text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                 </button>
-                
+                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
+                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </button>
             </div>
-            
         </div>
 
-        <div class="app-container show-left"> <div class="left-pane bg-black/30">
+        <div class="app-container show-left"> 
+            <div class="left-pane bg-black/30">
                 <div class="flex items-center justify-between mb-6 top-txt">
                     <h1 class="text-3xl font-semibold text-white">Messages</h1>
                     <div class="flex items-center space-x-3">
                         <button class="p-2 rounded-full items-center hover:bg-white/30 transition-colors">
-                            <i class='bxr  bx-microphone w-6 h-6 text-white text-3xl'  ></i> 
-                            
+                            <i class='bxr bx-microphone w-6 h-6 text-white text-3xl'></i> 
                         </button>
-                        
                     </div>
                 </div>
 
@@ -376,168 +410,48 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto pr-2">
-                    <div class="chat-list-item active" onclick="showRightPane()">
-                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Arlene McCoy" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Arlene McCoy</span>
-                                <span class="text-white/70 text-sm">Now</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">It's really nice.</p>
-                        </div>
+                <div class="flex-1 overflow-y-auto pr-2" id="chat-list">
                     </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-joelson-melo-9135-50855.jpg" alt="Guy Hawkins" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Guy Hawkins</span>
-                                <span class="text-white/70 text-sm">~4:45PM</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Are you there?</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-nappy-3460134.jpg" alt="Courtney Henry" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Courtney Henry</span>
-                                <span class="text-white/70 text-sm">~5:00PM</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Hello?</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-olly-3760376.jpg" alt="Jerome Bell" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Jerome Bell</span>
-                                <span class="text-white/70 text-sm">Yesterday</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Hello?</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-olly-3777564.jpg" alt="Jane Cooper" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Jane Cooper</span>
-                                <span class="text-white/70 text-sm">13 Mar</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Okay...</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-teddyjmodel-2955376.jpg" alt="Dianne Russell" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Dianne Russell</span>
-                                <span class="text-white/70 text-sm">2 Jan</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Hello? Interested...</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="https://placehold.co/48x48/6B7280/FFFFFF?text=RE" alt="Ralph Edwards" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Ralph Edwards</span>
-                                <span class="text-white/70 text-sm">2 Jan</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Hello?</p>
-                        </div>
-                    </div>
-                    <div class="chat-list-item" onclick="showRightPane()">
-                        <img src="./images/pexels-chloekalaartist-1043474.jpg" alt="Eleanor Pena" class="avatar">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-white font-medium">Eleanor Pena</span>
-                                <span class="text-white/70 text-sm">2 Jan</span>
-                            </div>
-                            <p class="text-white/80 text-sm truncate">Hi!</p>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="mt-6 ">
-                    <button class=" w-full p-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-between lg:justify-center hover:bg-white/50 transition-colors right-new-message">
+                    <button class="w-full p-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-between lg:justify-center hover:bg-white/50 transition-colors right-new-message">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         New Message
                     </button>
                 </div>
             </div>
 
-            <div class="right-pane bg-black/20 border-5 ">
-                <div class="flex items-center justify-between p-6   bg-black/20 border-b border-white/30">
+            <div class="right-pane bg-black/20 border-5">
+                <div class="flex items-center justify-between p-6 bg-black/20 border-b border-white/30">
                     <div class="flex items-center">
-                        <button class="right-arrow p-2 mr-2 rounded-full hover:bg-white/30 transition-colors md:hidden" onclick="showLeftPane()">
+                        <button class="right-arrow p-2 mr-2 rounded-full hover:bg-white/30 transition-colors" onclick="showLeftPane()">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                         </button>
-                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar chat-avatar">
+                        <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar chat-avatar" id="current-chat-avatar">
                         <div>
-                            <h2 class="text-xl font-semibold text-white">Arlene McCoy</h2>
-                            <p class="text-white/70 text-sm">guy102</p>
+                            <h2 class="text-xl font-semibold text-white" id="current-chat-name">Arlene McCoy</h2>
+                            <p class="text-white/70 text-sm" id="current-chat-username">arlene.m</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
                         <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                            <i class='bxr  bx-phone w-6 h-6 text-white text-3xl'  ></i> 
+                            <i class='bxr bx-phone w-6 h-6 text-white text-3xl'></i> 
                         </button>
                         <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                           <i class='bxr  bx-camera-alt w-6 h-6 text-white text-3xl'  ></i> 
+                           <i class='bxr bx-camera-alt w-6 h-6 text-white text-3xl'></i> 
                         </button>
                         <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                            <i class='bxr  bx-clock-12 w-6 h-6 text-white text-3xl'  ></i> 
+                            <i class='bxr bx-dots-vertical-rounded w-6 h-6 text-white text-3xl'></i> 
                         </button>
                     </div>
                 </div>
 
-                <div class="flex-1 p-6 overflow-y-auto flex flex-col message-area">
-                    <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
-
-                    <div class="message-bubble received-message">
-                        <p>Hey there! 👋 I've been feeling quite overwhelmed lately with work.</p>
-                        <span class="message-time">04:15 AM</span>
+                <div class="flex-1 p-6 overflow-y-auto flex flex-col message-area" id="message-area">
                     </div>
-
-                    <div class="message-bubble sent-message">
-                        <p>Amante de cinema e viciado em pipoca! 🍿</p>
-                        <span class="message-time">08:20 PM</span>
-                    </div>
-
-                    <div class="text-center text-white/70 text-sm my-4">April 28, 2024</div>
-
-                    <div class="message-bubble received-message">
-                        <p>When will the contract be sent?</p>
-                        <span class="message-time">06:15 AM</span>
-                    </div>
-
-                    <div class="message-bubble sent-message">
-                        <p>Paperless opt-in email sent</p>
-                        <span class="message-time">08:20 PM</span>
-                    </div>
-
-                    <div class="message-bubble received-message">
-                        <p>Got it. Thanks!</p>
-                        <span class="message-time">08:25 PM</span>
-                    </div>
-                    <div class="message-bubble sent-message">
-                        <p>You're welcome!</p>
-                        <span class="message-time">08:26 PM</span>
-                    </div>
-                    <div class="message-bubble received-message">
-                        <p>How's your day going?</p>
-                        <span class="message-time">08:30 PM</span>
-                    </div>
-                    <div class="message-bubble sent-message">
-                        <p>Pretty good, just wrapping up some tasks.</p>
-                        <span class="message-time">08:35 PM</span>
-                    </div>
-                </div>
 
                 <div class="p-6 bg-black/20 border-t border-white/30 flex items-center space-x-4">
-                    <input type="text" placeholder="Write something" class="flex-1 py-3 px-5 rounded-full bg-black/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50">
-                    <button class="bg-white hover:bg-black hover:text-white text-black font-semibold py-3 px-6 rounded-full shadow-lg transition-colors">
+                    <input type="text" placeholder="Write something" class="flex-1 py-3 px-5 rounded-full bg-black/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50" id="message-input">
+                    <button class="bg-white hover:bg-black hover:text-white text-black font-semibold py-3 px-6 rounded-full shadow-lg transition-colors" id="send-button">
                         Send
                     </button>
                 </div>
@@ -546,52 +460,306 @@
     </div>
 
     <script>
+        // Sample chat data
+        const chats = [
+            {
+                id: 'arlene',
+                name: 'Arlene McCoy',
+                username: 'arlene.m',
+                avatar: './images/pexels-elsimage-1405963.jpg',
+                lastMessage: "It's really nice.",
+                lastMessageTime: 'Now',
+                messages: [
+                    { sender: 'received', text: "Hey there! 👋 I've been feeling quite overwhelmed lately with work.", time: '04:15 AM' },
+                    { sender: 'sent', text: "Amante de cinema e viciado em pipoca! 🍿", time: '08:20 PM' },
+                    { sender: 'received', text: "When will the contract be sent?", time: '06:15 AM' },
+                    { sender: 'sent', text: "Paperless opt-in email sent", time: '08:20 PM' },
+                    { sender: 'received', text: "Got it. Thanks!", time: '08:25 PM' },
+                    { sender: 'sent', text: "You're welcome!", time: '08:26 PM' },
+                    { sender: 'received', text: "How's your day going?", time: '08:30 PM' },
+                    { sender: 'sent', text: "Pretty good, just wrapping up some tasks.", time: '08:35 PM' },
+                ]
+            },
+            {
+                id: 'guy',
+                name: 'Guy Hawkins',
+                username: 'guy.h',
+                avatar: './images/pexels-joelson-melo-9135-50855.jpg',
+                lastMessage: "Are you there?",
+                lastMessageTime: '~4:45PM',
+                messages: [
+                    { sender: 'received', text: "Hey! What's up?", time: '04:40 PM' },
+                    { sender: 'sent', text: "Just checking in. Are you there?", time: '04:45 PM' },
+                ]
+            },
+            {
+                id: 'courtney',
+                name: 'Courtney Henry',
+                username: 'courtney.h',
+                avatar: './images/pexels-nappy-3460134.jpg',
+                lastMessage: "Hello?",
+                lastMessageTime: '~5:00PM',
+                messages: [
+                    { sender: 'received', text: "Hi! How are you doing?", time: '04:55 PM' },
+                    { sender: 'sent', text: "I'm good, thanks! Just wanted to say hello.", time: '04:58 PM' },
+                    { sender: 'received', text: "Hello?", time: '05:00 PM' },
+                ]
+            },
+            {
+                id: 'jerome',
+                name: 'Jerome Bell',
+                username: 'jerome.b',
+                avatar: './images/pexels-olly-3760376.jpg',
+                lastMessage: "Hello?",
+                lastMessageTime: 'Yesterday',
+                messages: [
+                    { sender: 'sent', text: "Hey Jerome, just following up on our last conversation.", time: 'Yesterday 10:00 AM' },
+                    { sender: 'received', text: "Hello?", time: 'Yesterday 10:05 AM' },
+                ]
+            },
+            {
+                id: 'jane',
+                name: 'Jane Cooper',
+                username: 'jane.c',
+                avatar: './images/pexels-olly-3777564.jpg',
+                lastMessage: "Okay...",
+                lastMessageTime: '13 Mar',
+                messages: [
+                    { sender: 'sent', text: "Can we schedule a meeting for next week?", time: '13 Mar' },
+                    { sender: 'received', text: "Okay...", time: '13 Mar' },
+                ]
+            },
+            {
+                id: 'dianne',
+                name: 'Dianne Russell',
+                username: 'dianne.r',
+                avatar: './images/pexels-teddyjmodel-2955376.jpg',
+                lastMessage: "Hello? Interested...",
+                lastMessageTime: '2 Jan',
+                messages: [
+                    { sender: 'received', text: "Hello? Interested in the project we discussed?", time: '2 Jan' },
+                    { sender: 'sent', text: "Yes, definitely! Let's connect soon.", time: '2 Jan' },
+                ]
+            },
+            {
+                id: 'ralph',
+                name: 'Ralph Edwards',
+                username: 'ralph.e',
+                avatar: 'https://placehold.co/48x48/6B7280/FFFFFF?text=RE',
+                lastMessage: "Hello?",
+                lastMessageTime: '2 Jan',
+                messages: [
+                    { sender: 'sent', text: "Good morning, Ralph!", time: '2 Jan' },
+                    { sender: 'received', text: "Hello?", time: '2 Jan' },
+                ]
+            },
+            {
+                id: 'eleanor',
+                name: 'Eleanor Pena',
+                username: 'eleanor.p',
+                avatar: './images/pexels-chloekalaartist-1043474.jpg',
+                lastMessage: "Hi!",
+                lastMessageTime: '2 Jan',
+                messages: [
+                    { sender: 'received', text: "Hi!", time: '2 Jan' },
+                ]
+            }
+        ];
+
+        let currentChatId = 'arlene'; // Default active chat
+
+        // Get DOM elements
+        const chatListContainer = document.getElementById('chat-list');
+        const messageArea = document.getElementById('message-area');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const currentChatName = document.getElementById('current-chat-name');
+        const currentChatUsername = document.getElementById('current-chat-username');
+        const currentChatAvatar = document.getElementById('current-chat-avatar');
+        const appContainer = document.querySelector('.app-container');
+
+        /**
+         * Renders the list of chats in the left pane.
+         */
+        function renderChatList() {
+            chatListContainer.innerHTML = ''; // Clear existing list
+            chats.forEach(chat => {
+                const chatListItem = document.createElement('div');
+                chatListItem.classList.add('chat-list-item');
+                if (chat.id === currentChatId) {
+                    chatListItem.classList.add('active');
+                }
+                chatListItem.setAttribute('data-chat-id', chat.id);
+                chatListItem.onclick = () => selectChat(chat.id);
+
+                chatListItem.innerHTML = `
+                    <img src="${chat.avatar}" alt="${chat.name}" class="avatar">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white font-medium">${chat.name}</span>
+                            <span class="text-white/70 text-sm">${chat.lastMessageTime}</span>
+                        </div>
+                        <p class="text-white/80 text-sm truncate">${chat.lastMessage}</p>
+                    </div>
+                `;
+                chatListContainer.appendChild(chatListItem);
+            });
+        }
+
+        /**
+         * Renders messages for the currently selected chat.
+         */
+        function renderMessages() {
+            messageArea.innerHTML = ''; // Clear existing messages
+            const currentChat = chats.find(chat => chat.id === currentChatId);
+
+            if (currentChat) {
+                // Update chat header
+                currentChatName.textContent = currentChat.name;
+                currentChatUsername.textContent = currentChat.username;
+                currentChatAvatar.src = currentChat.avatar;
+                currentChatAvatar.alt = currentChat.name;
+
+                // Add messages with date separators
+                let lastDate = '';
+                currentChat.messages.forEach(message => {
+                    // For demonstration, using current date. In a real app, parse message.time for date part.
+                    const messageDateTime = new Date(); 
+                    const messageDate = messageDateTime.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+                    // Only show date separator if date changes or if it's the first message
+                    if (messageDate !== lastDate) {
+                        const dateSeparator = document.createElement('div');
+                        dateSeparator.classList.add('text-center', 'text-white/70', 'text-sm', 'my-4');
+                        dateSeparator.textContent = messageDate;
+                        messageArea.appendChild(dateSeparator);
+                        lastDate = messageDate;
+                    }
+
+                    const messageBubble = document.createElement('div');
+                    messageBubble.classList.add('message-bubble', message.sender === 'sent' ? 'sent-message' : 'received-message');
+                    messageBubble.innerHTML = `
+                        <p>${message.text}</p>
+                        <span class="message-time">${message.time}</span>
+                    `;
+                    messageArea.appendChild(messageBubble);
+                });
+                messageArea.scrollTop = messageArea.scrollHeight; // Scroll to bottom
+            }
+        }
+
+        /**
+         * Handles sending a new message.
+         */
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                const currentChat = chats.find(chat => chat.id === currentChatId);
+                if (currentChat) {
+                    currentChat.messages.push({ sender: 'sent', text: messageText, time: timeString });
+                    currentChat.lastMessage = messageText;
+                    currentChat.lastMessageTime = 'Now';
+                    renderMessages();
+                    renderChatList(); // Update last message in chat list
+                }
+                messageInput.value = ''; // Clear input
+            }
+        }
+
+        /**
+         * Selects a chat and updates the UI.
+         * @param {string} chatId - The ID of the chat to select.
+         */
+        function selectChat(chatId) {
+            currentChatId = chatId;
+            renderChatList(); // Re-render to update active state
+            renderMessages();
+            showRightPane(); // Show right pane on mobile when a chat is selected
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
         // JavaScript for showing/hiding panes on mobile
         function showRightPane() {
             if (window.innerWidth <= 768) {
-                document.querySelector('.app-container').classList.remove('show-left');
-                document.querySelector('.app-container').classList.add('show-right');
+                appContainer.classList.remove('show-left');
+                appContainer.classList.add('show-right');
             }
         }
 
         function showLeftPane() {
             if (window.innerWidth <= 768) {
-                document.querySelector('.app-container').classList.remove('show-right');
-                document.querySelector('.app-container').classList.add('show-left');
+                appContainer.classList.remove('show-right');
+                appContainer.classList.add('show-left');
             }
         }
 
         // Initialize display based on screen size
-        // window.onload = function() {
-        //     if (window.innerWidth <= 768) {
-        //         document.querySelector('.right-pane').style.display = 'none'; // Initially hide right pane on mobile
-        //     }
-        // };
-
-        window.onresize = function() {
-            const appContainer = document.querySelector('.app-container');
+        function adjustPaneVisibility() {
             const leftPane = document.querySelector('.left-pane');
             const rightPane = document.querySelector('.right-pane');
 
             if (window.innerWidth > 768) {
+                // Desktop: Always show both panes, remove mobile-specific classes
                 appContainer.classList.remove('show-left', 'show-right');
-                leftPane.style.display = 'flex'; // Ensure flex display on desktop
-                rightPane.style.display = 'flex'; // Ensure flex display on desktop
+                // Reset styles that might have been applied by mobile classes
+                leftPane.style.opacity = '1';
+                leftPane.style.pointerEvents = 'auto';
+                rightPane.style.opacity = '1';
+                rightPane.style.pointerEvents = 'auto';
+                leftPane.style.position = 'static'; /* Reset position */
+                rightPane.style.position = 'static'; /* Reset position */
+                leftPane.style.height = 'auto'; /* Reset height */
+                rightPane.style.height = 'auto'; /* Reset height */
+                // Ensure flex properties for desktop layout
+                leftPane.style.flex = '0 0 35%';
+                rightPane.style.flex = '1';
+                // Reset border-radius for desktop
+                leftPane.style.borderRadius = '2rem 0px 0px 2rem';
+                rightPane.style.borderRadius = '0px 2rem 2rem 0px';
             } else {
-                // On mobile, if neither is explicitly shown, default to showing left
+                // Mobile: Set up for single-pane display using opacity/transform
+                leftPane.style.position = 'absolute';
+                rightPane.style.position = 'absolute';
+                leftPane.style.height = '100%'; /* Take full height of app-container */
+                rightPane.style.height = '100%'; /* Take full height of app-container */
+                leftPane.style.flex = 'none'; /* Remove flex basis */
+                rightPane.style.flex = 'none'; /* Remove flex basis */
+                // Apply full border-radius for mobile panes
+                leftPane.style.borderRadius = '2rem';
+                rightPane.style.borderRadius = '2rem';
+
+
+                // If no specific pane is active (e.g., initial load), default to showing left
                 if (!appContainer.classList.contains('show-left') && !appContainer.classList.contains('show-right')) {
                     appContainer.classList.add('show-left');
-                    leftPane.style.display = 'flex';
-                    rightPane.style.display = 'none';
-                } else if (appContainer.classList.contains('show-left')) {
-                    leftPane.style.display = 'flex';
-                    rightPane.style.display = 'none';
-                } else if (appContainer.classList.contains('show-right')) {
-                    leftPane.style.display = 'none';
-                    rightPane.style.display = 'flex';
                 }
             }
-        };
+        }
+
+        // Initial rendering
+        renderChatList();
+        renderMessages();
+        adjustPaneVisibility(); // Call on initial load
+
+        // Call adjustPaneVisibility on resize
+        window.addEventListener('resize', adjustPaneVisibility);
+
+        // Ensure that when the app first loads on mobile, it shows the left pane.
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth <= 768) {
+                appContainer.classList.add('show-left');
+            }
+        });
     </script>
 </body>
 </html>
