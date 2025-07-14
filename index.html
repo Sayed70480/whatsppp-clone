@@ -168,10 +168,11 @@
        
        
 
-        @media (max-width: 768px) {
+       @media (max-width: 768px) {
             body {
                 align-items: flex-start;
                 min-height: 97vh;
+                overflow: hidden; /* Add this line to prevent body scrolling */
             }
 
             .app-overall-container {
@@ -182,6 +183,8 @@
                 max-width: none;
                 align-items: center;
             }
+            /* ... (rest of your existing mobile CSS) ... */
+        }
 
             .left-sidebar {
                 width: 100%;
