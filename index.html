@@ -14,25 +14,22 @@
             padding: 0;
             display: flex;
             min-height: 100vh;
-            background-image: url('./images/background.jpg'); 
+            background-image: url('./images/background.jpg'); /* Ensure this path is correct */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            justify-content: center; 
+            justify-content: center;
             align-items: center;
-             
-
         }
 
         .app-overall-container {
             display: flex;
-            height: 100vh; 
-            width: 100vw; 
-            max-width: none; 
+            height: 100vh;
+            width: 100vw;
+            max-width: none;
             max-height: none; /* Remove max-height for full screen */
             justify-content: flex-start; /* Align items to the start for the three-column layout */
             align-items: stretch; /* Stretch items to fill the height */
-           
         }
 
         .app-container {
@@ -46,7 +43,7 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
             /* For large screens, no border-radius */
-            border-radius: 0; 
+            border-radius: 0;
         }
 
         .left-sidebar {
@@ -71,10 +68,10 @@
         .left-pane {
             flex: 0 0 35%;
             background-color: rgba(255, 255, 255, 0.2);
-            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            
             display: flex;
             flex-direction: column;
-            padding: 1rem 0.5rem;
+            /* padding: 1rem 0.5rem; */
             overflow-y: auto;
             border-radius: 0; /* No border-radius for full screen */
         }
@@ -134,15 +131,15 @@
         }
 
         .sent-message {
-            background-color: rgba(100, 116, 139, 0.6);
+            background-color: rgba(199, 202, 205, 0.6);
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 0.25rem;
         }
 
         .received-message {
-            background-color: rgba(255, 255, 255, 0.6);
-            color: #333;
+            background-color: rgba(71, 66, 66, 0.6);
+            color: white;
             align-self: flex-start;
             border-bottom-left-radius: 0.25rem;
         }
@@ -160,16 +157,16 @@
 
         .received-message .message-time {
             text-align: left;
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.8);
         }
+
+        /* Hide right-arrow by default for larger screens */
         .right-arrow {
             display: none;
         }
 
-       
-       
 
-       @media (max-width: 768px) {
+        @media (max-width: 768px) {
             body {
                 align-items: flex-start;
                 min-height: 100vh;
@@ -178,15 +175,13 @@
 
             .app-overall-container {
                 flex-direction: column;
-                height: 97vh;
+                height: 100vh;
                 min-height: auto;
                 width: 100%;
                 max-width: none;
                 align-items: center;
             }
-            /* ... (rest of your existing mobile CSS) ... */
-       
-
+            
             .left-sidebar {
                 width: 100%;
                 height: auto;
@@ -196,7 +191,6 @@
                 justify-content: space-around;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
                 /* border-radius: 1rem;  */
-                
             }
 
             .left-sidebar > div:first-child {
@@ -218,9 +212,8 @@
             .app-container {
                 flex-direction: column;
                 width: 100%;
-                height: 91vh;
+                height: 100vh;
                 max-width: none;
-                
                 overflow: hidden;
             }
 
@@ -236,7 +229,6 @@
                 display: flex;
                 flex-direction: column;
                 overflow-y: auto;
-               
             }
             .app-container.show-left .left-pane {
                 opacity: 1;
@@ -299,9 +291,6 @@
                 margin-bottom: none !important;
             }
 
-            /* Hide profile section on mobile */
-           
-
             /* Adjust new message button for mobile */
             .right-new-message {
                 justify-content: center !important; /* Center content */
@@ -357,59 +346,40 @@
 <body class="bg-gray-100 antialiased ">
 
     <div class="app-overall-container">
-        <div class="left-sidebar  bg-black/30  ">
-            <div class="flex flex-col items-center space-y-1 flex-grow">
-                <button class="p-3 rounded-full bg-white/40 hover:bg-white/50 transition-colors">
-                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m7-7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                </button>
-                <button class="p-3 rounded-full hover:bg-white/50 transition-colors">
-                    <i class='left-side-btn bxr bx-search-alt w-7 text-white text-3xl'></i>
-                </button>
-                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <i class='left-side-btn bxr bx-plus-square w-7 text-white text-3xl'></i>
-                </button>
-                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                </button>
-                <button class="p-3 rounded-full hover:bg-white/30 transition-colors">
-                    <svg class="left-side-btn w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                </button>
-            </div>
-           
-        </div>
         <div class="app-container show-left">
-            <div class="left-pane bg-black/10">
-                <div class="flex items-center justify-between mb-6 top-txt">
+            <div class="left-pane bg-black/40">
+                <div class="flex items-center pl-5 pr-5 justify-between mb-6 top-txt">
                     <h1 class="text-3xl font-semibold text-white">Messages</h1>
                     <div class="flex items-center space-x-3">
                         <button class="p-2 rounded-full items-center hover:bg-white/30 transition-colors">
-                            <i class='bxr bx-microphone w-6 h-6 text-white text-3xl'></i>
+                            <i class='bxr bx-microphone text-white/70 text-2xl text-3xl'></i>
                         </button>
                     </div>
                 </div>
-                <div class="relative mb-6">
+                <div class="relative pl-0 pr-0 lg:pl-5 lg:pr-5 mb-6">
                     <input type="text" placeholder="Search" class="w-full pl-10 pr-4 py-2 rounded-xl bg-black/40 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div class="absolute inset-y-0 left-0 pl-2 lg:pl-7 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto pr-2" id="chat-list">
+                <div class="flex-1 overflow-y-auto " id="chat-list">
                 </div>
 
-                <div class="mt-6 ">
-                    <button class="w-full p-3 rounded-xl bg-black/20 text-white font-semibold flex items-center justify-between lg:justify-center hover:bg-white/50 transition-colors right-new-message">
+                <div class="mt-6 mb-5 flex items-center justify-center " >
+                    <button class="w-80 p-3 rounded-xl bg-white/20 text-white font-semibold flex items-center justify-between lg:justify-center hover:bg-white/50 transition-colors right-new-message">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         New Message
                     </button>
+                    
                 </div>
             </div>
 
             <div class="right-pane bg-black/10 border-5">
                 <div class="flex items-center justify-between p-6 bg-black/10 border-b border-white/30">
-                    <div class="flex items-center">
-                        <button class="right-arrow p-1 rounded-full hover:bg-white/30 transition-colors" onclick="showLeftPane()">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <div class="flex items-center ">
+                        <button class="flex items-center right-arrow mr-2 p-1 rounded-full hover:bg-white/30 transition-colors" onclick="showLeftPane()">
+                           <i class='bxr  bx-arrow-left-stroke text-3xl  text-white'  ></i> 
                         </button>
                         <img src="./images/pexels-elsimage-1405963.jpg" alt="Guy Hawkins" class="avatar chat-avatar" id="current-chat-avatar">
                         <div>
@@ -417,17 +387,17 @@
                             <p class="text-white/70 text-sm" id="current-chat-username">arlene.m</p>
                         </div>
                     </div>
-                    <div class="flex items-center ">
-                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                            <i class='bxr bx-phone w-6 h-6 text-white text-3xl'></i>
-                        </button>
-                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                           <i class='bxr bx-camera-alt w-6 h-6 text-white text-3xl'></i>
-                        </button>
-                        <button class="p-2 rounded-full hover:bg-white/30 transition-colors">
-                            <i class='bxr bx-dots-vertical-rounded w-6 h-6 text-white text-3xl'></i>
-                        </button>
-                    </div>
+                    <div class="flex gap-1 lg:gap-4 items-center ">
+    <button class="p-2 rounded-full hover:bg-white/30 transition-colors flex items-center justify-center">
+        <i class='bxr bx-phone text-white text-xl'></i>
+    </button>
+    <button class="p-2 rounded-full hover:bg-white/30 transition-colors flex items-center justify-center">
+       <i class='bxr bx-camera-alt text-white text-xl'></i>
+    </button>
+    <button class="p-2 rounded-full hover:bg-white/30 transition-colors flex items-center justify-center">
+        <i class='bxr bx-minus-circle  text-white text-xl'></i>
+    </button>
+</div>
                 </div>
 
                 <div class="flex-1 p-6 overflow-y-auto flex flex-col message-area" id="message-area">
@@ -562,7 +532,7 @@
             chatListContainer.innerHTML = '';
             chats.forEach(chat => {
                 const chatListItem = document.createElement('div');
-                chatListItem.classList.add('chat-list-item');
+                chatListItem.classList.add('chat-list-item', 'relative'); // Added 'relative' for absolute positioning of icon
                 if (chat.id === currentChatId) {
                     chatListItem.classList.add('active');
                 }
@@ -572,11 +542,17 @@
                 chatListItem.innerHTML = `
                     <img src="${chat.avatar}" alt="${chat.name}" class="avatar">
                     <div class="flex-1">
-                        <div class="flex justify-between items-center">
-                            <span class="text-white font-medium">${chat.name}</span>
-                            <span class="text-white/70 text-sm">${chat.lastMessageTime}</span>
+                        <div class=" flex justify-between items-center ">
+                           <div class="flex flex-col">   
+                                <span class="text-white font-medium">${chat.name}</span>
+                           <div class="flex justify-between w-52 lg:w-72 items-center">
+    <p class="text-white/80 text-sm truncate">${chat.lastMessage}</p>
+    <span class="text-white/70 text-sm">${chat.lastMessageTime}</span>
+</div>
+                                </div>
+                           <div><i class='bxr bx-microphone text-white/70 text-2xl'></i></div>
                         </div>
-                        <p class="text-white/80 text-sm truncate">${chat.lastMessage}</p>
+                        
                     </div>
                 `;
                 chatListContainer.appendChild(chatListItem);
@@ -594,7 +570,7 @@
                 currentChatAvatar.alt = currentChat.name;
                 let lastDate = '';
                 currentChat.messages.forEach(message => {
-                    const messageDateTime = new Date();
+                    const messageDateTime = new Date(); // This will always be "Now" due to Date()
                     const messageDate = messageDateTime.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
                     if (messageDate !== lastDate) {
@@ -608,6 +584,7 @@
                     const messageBubble = document.createElement('div');
                     messageBubble.classList.add('message-bubble', message.sender === 'sent' ? 'sent-message' : 'received-message');
                     messageBubble.innerHTML = `
+                    
                         <p>${message.text}</p>
                         <span class="message-time">${message.time}</span>
                     `;
